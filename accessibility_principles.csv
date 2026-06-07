@@ -1,0 +1,5 @@
+Principle,What it means,What the agent flags,Area
+Perceivable,Information must be presentable in ways all users can perceive.,"Low contrast, missing alt text, no captions, color-only meaning.",Accessibility
+Operable,Interface components must be operable by any input method.,"Keyboard traps, no focus management, missing focus indicator, tiny targets.",Accessibility
+Understandable,Content and operation must be readable and predictable.,"Unlabelled fields, inconsistent navigation, unclear error identification.",Accessibility · Content UX
+Robust,Content must work reliably with assistive technologies.,Non-semantic markup; controls that screen readers can't interpret.,Accessibility

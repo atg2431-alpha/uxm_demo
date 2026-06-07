@@ -1,0 +1,28 @@
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+
+# ─── Environment & Secrets ────────────────────────────────────────────────────
+# .env holds your GOOGLE_API_KEY — never commit this
+.env
+.env.local
+.env.*.local
+
+# ─── TypeScript Build Output ──────────────────────────────────────────────────
+dist/
+
+# ─── Generated Files ──────────────────────────────────────────────────────────
+# Mermaid and PNG files produced by `npm run graph`
+*.mmd
+graph.png
+
+# ─── Sample Images ────────────────────────────────────────────────────────────
+# Uncomment the lines below if your screenshots contain sensitive UI / client work
+# samples/
+
+# ─── OS & Editor Noise ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
