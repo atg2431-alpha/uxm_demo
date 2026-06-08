@@ -1,8 +1,10 @@
 /**
  * run.ts
  * -------
- * Entry point. Loads your 3 sample images, runs the 2-agent graph,
+ * Entry point. Loads sample images, runs the 3-agent graph,
  * and prints the findings to the console.
+ *
+ * Agents: Grounding → [Usability (Nielsen) + Accessibility (POUR)] in parallel
  *
  * HOW TO USE:
  *   1. Put your 3 screenshots in the samples/ folder:
@@ -16,7 +18,7 @@
 import "dotenv/config";
 import { readFileSync, existsSync } from "fs";
 import { buildGraph } from "./graph.js";
-import type { NielsenOutput } from "./schemas.js";
+import type { NielsenOutput, AccessibilityOutput } from "./schemas.js";
 
 // ─── Your 3 Sample Images ─────────────────────────────────────────────────
 // Paths are relative to the project root (where you run `npm start`)
@@ -83,9 +85,40 @@ function printResults(output: NielsenOutput) {
   console.log("─".repeat(56));
 
   // Print in P0 → P1 → P2 order so blockers are always at the top
-  [...P0, ...P1, ...P2].forEach((f, i) => {
+  [...P0, ...P1, ...P2].forEach((f) => {
     const badge = f.severity === "P0" ? "🔴 P0" : f.severity === "P1" ? "🟡 P1" : "🟢 P2";
     console.log(`\n${badge}  [${f.id}] ${f.region}`);
+    console.log(`   Principle : ${f.principle}`);
+    console.log(`   Issue     : ${f.issue}`);
+    console.log(`   Why       : ${f.why}`);
+    console.log(`   Fix       : ${f.fix}`);
+    console.log(`   Confidence: ${Math.round(f.confidence * 100)}%`);
+  });
+
+  console.log("\n─".repeat(4));
+  console.log(`Coverage note: ${output.coverageNote}`);
+  console.log("");
+}
+
+// ─── Accessibility Printer ─────────────────────────────────────────────────
+// Mirrors printResults() but also shows the optional wcagCriteria field.
+
+function printAccessibilityResults(output: AccessibilityOutput) {
+  const P0 = output.findings.filter((f) => f.severity === "P0");
+  const P1 = output.findings.filter((f) => f.severity === "P1");
+  const P2 = output.findings.filter((f) => f.severity === "P2");
+
+  console.log("\n╔══════════════════════════════════════════════════════╗");
+  console.log("║           Accessibility Review (WCAG POUR)            ║");
+  console.log("╚══════════════════════════════════════════════════════╝");
+  console.log(`\nSummary: ${output.summary}\n`);
+  console.log(`Findings: ${output.findings.length} total  |  P0: ${P0.length}  P1: ${P1.length}  P2: ${P2.length}`);
+  console.log("─".repeat(56));
+
+  [...P0, ...P1, ...P2].forEach((f) => {
+    const badge = f.severity === "P0" ? "🔴 P0" : f.severity === "P1" ? "🟡 P1" : "🟢 P2";
+    const wcag = f.wcagCriteria ? `  [WCAG ${f.wcagCriteria}]` : "";
+    console.log(`\n${badge}  [${f.id}] ${f.region}${wcag}`);
     console.log(`   Principle : ${f.principle}`);
     console.log(`   Issue     : ${f.issue}`);
     console.log(`   Why       : ${f.why}`);
@@ -102,8 +135,8 @@ function printResults(output: NielsenOutput) {
 
 async function main() {
   console.log("\n╔══════════════════════════════════════════════════════╗");
-  console.log("║         UXM Co-Pilot — 2-Agent Demo                  ║");
-  console.log("║         Grounding  →  Nielsen Usability               ║");
+  console.log("║         UXM Co-Pilot — 3-Agent Demo                  ║");
+  console.log("║   Grounding → [Usability + Accessibility] in parallel ║");
   console.log("╚══════════════════════════════════════════════════════╝");
 
   // Load images
@@ -138,6 +171,13 @@ async function main() {
     printResults(finalState.nielsenOutput);
   } else {
     console.error("\nNo Nielsen output returned — check the logs above for errors.");
+  }
+
+  // Print Accessibility findings
+  if (finalState.accessibilityOutput) {
+    printAccessibilityResults(finalState.accessibilityOutput);
+  } else {
+    console.error("\nNo Accessibility output returned — check the logs above for errors.");
   }
 }
 

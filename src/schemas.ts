@@ -116,3 +116,32 @@ export const NielsenOutputSchema = z.object({
     .describe("What you checked, what was unclear, any limitations in this analysis"),
 });
 export type NielsenOutput = z.infer<typeof NielsenOutputSchema>;
+
+// ─── Accessibility Agent Output ───────────────────────────────────────────────
+// Uses the same FindingSchema (id, region, issue, principle, severity, fix, confidence)
+// but the principle field will contain a WCAG POUR principle name instead of a Nielsen one.
+
+export const AccessibilityOutputSchema = z.object({
+  findings: z.array(
+    FindingSchema.extend({
+      principle: z
+        .string()
+        .describe(
+          "The WCAG POUR principle violated: 'Perceivable', 'Operable', 'Understandable', or 'Robust'"
+        ),
+      wcagCriteria: z
+        .string()
+        .optional()
+        .describe("The specific WCAG criterion if known, e.g. '1.1.1 Non-text Content'"),
+    })
+  ),
+
+  summary: z
+    .string()
+    .describe("2-3 sentence overall accessibility assessment of this screen"),
+
+  coverageNote: z
+    .string()
+    .describe("What you checked and what could not be determined from a static screenshot alone"),
+});
+export type AccessibilityOutput = z.infer<typeof AccessibilityOutputSchema>;

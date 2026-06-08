@@ -4,29 +4,35 @@
  * Wires the two agents into a LangGraph graph and compiles it.
  *
  * Flow:
- *   START → grounding → usability → END
+ *   START → grounding → usability   → END
+ *                     ↘ accessibility → END
  *
- * Run `npm run graph` to print the Mermaid diagram to console.
- * Paste the output at https://mermaid.live to see it rendered.
+ *   (usability and accessibility run in parallel after grounding finishes)
  */
 
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { GraphState } from "./state.js";
 import { groundingAgent } from "./agents/grounding.js";
 import { usabilityAgent } from "./agents/usability.js";
+import { accessibilityAgent } from "./agents/accessibility.js";
 
 // ─── Build & Compile ───────────────────────────────────────────────────────
 
 export function buildGraph() {
   const graph = new StateGraph(GraphState)
-    // Register both nodes
+    // Register all nodes
     .addNode("grounding", groundingAgent)
-    .addNode("usability", usabilityAgent);
+    .addNode("usability", usabilityAgent)
+    .addNode("accessibility", accessibilityAgent); // runs in parallel with usability
 
-  // Wire edges: linear flow, grounding must finish before usability starts
+  // Wire edges:
+  //   grounding → usability     ┐
+  //   grounding → accessibility ┘  both fan out from grounding (parallel)
   graph.addEdge(START, "grounding");
   graph.addEdge("grounding", "usability");
+  graph.addEdge("grounding", "accessibility"); // NEW — parallel fan-out
   graph.addEdge("usability", END);
+  graph.addEdge("accessibility", END);          // NEW — independent path to END
 
   return graph.compile();
 }
