@@ -145,3 +145,86 @@ export const AccessibilityOutputSchema = z.object({
     .describe("What you checked and what could not be determined from a static screenshot alone"),
 });
 export type AccessibilityOutput = z.infer<typeof AccessibilityOutputSchema>;
+// ─── Cognitive Interaction Agent Output ───────────────────────────────────────
+
+export const CognitiveInteractionOutputSchema = z.object({
+  findings: z.array(
+    FindingSchema.extend({
+      principle: z
+        .string()
+        .describe("Exact name of the Cognitive Interaction Law violated, e.g. 'Fitts\\'s Law' or 'Hick\\'s Law'"),
+    })
+  ),
+
+  summary: z
+    .string()
+    .describe("2-3 sentence overall assessment of mental load, friction, and interaction physics on this screen"),
+
+  coverageNote: z
+    .string()
+    .describe("What you checked and what interaction details could not be determined from a static image"),
+});
+export type CognitiveInteractionOutput = z.infer<typeof CognitiveInteractionOutputSchema>;
+
+// ─── Content Microcopy Agent Output ───────────────────────────────────────────
+
+export const ContentMicrocopyOutputSchema = z.object({
+  findings: z.array(
+    FindingSchema.extend({
+      principle: z
+        .string()
+        .describe("Exact name of the Content Principle violated, e.g. 'Clarity over cleverness'"),
+    })
+  ),
+
+  summary: z
+    .string()
+    .describe("2-3 sentence overall assessment of text clarity, tone, and labeling on this screen"),
+
+  coverageNote: z
+    .string()
+    .describe("What you checked and any limitations (e.g., hidden tooltips, unrendered states)"),
+});
+export type ContentMicrocopyOutput = z.infer<typeof ContentMicrocopyOutputSchema>;
+
+// ─── Gestalt Agent Output ─────────────────────────────────────────────────────
+
+export const GestaltOutputSchema = z.object({
+  findings: z.array(
+    FindingSchema.extend({
+      principle: z
+        .string()
+        .describe("Exact name of the Gestalt Principle violated, e.g. 'Proximity', 'Similarity', or 'Common Region'"),
+    })
+  ),
+
+  summary: z
+    .string()
+    .describe("2-3 sentence overall assessment of structural grouping and visual relationships"),
+
+  coverageNote: z
+    .string()
+    .describe("What you checked and limitations in determining structural intent from a flat image"),
+});
+export type GestaltOutput = z.infer<typeof GestaltOutputSchema>;
+
+// ─── Visual Design Agent Output ───────────────────────────────────────────────
+
+export const VisualDesignOutputSchema = z.object({
+  findings: z.array(
+    FindingSchema.extend({
+      principle: z
+        .string()
+        .describe("Exact name of the Visual Design Principle violated, e.g. 'Visual hierarchy', 'Alignment', or 'White space'"),
+    })
+  ),
+
+  summary: z
+    .string()
+    .describe("2-3 sentence overall assessment of aesthetics, styling, and visual polish"),
+
+  coverageNote: z
+    .string()
+    .describe("What you checked and limitations (e.g., hover states, animations not visible)"),
+});
+export type VisualDesignOutput = z.infer<typeof VisualDesignOutputSchema>;
